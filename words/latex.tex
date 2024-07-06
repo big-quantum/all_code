@@ -1,0 +1,206 @@
+\documentclass{article}
+
+\usepackage{ctex}
+\usepackage{xltxtra}
+\usepackage{texnames}
+\usepackage{mflogo}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+
+
+\title{LateX特殊字符}
+\author{WSKH}
+\date{\today}
+
+\begin{document}
+	\maketitle
+	\section{空白符号}
+	空白格 空白格
+	
+	空白格        空白格
+	
+	Hello Hello
+	
+	Hello      Hello
+	\subsection{空行分段，多个空行等同于1个}
+	\subsection{自动缩进，绝对不能使用空格代替}
+	\subsection{英文中多个空格处理为1个空格，中文中空格将被忽略}
+	\subsection{汉字与其他字符的间距会自动由XeLateX处理}
+	\subsection{禁止使用中文全角空格}
+	
+	\section{控制字体宽度}
+	\subsection{控制空格}
+	a\quad b\par              %1em（当前字体中M的宽度）
+	a\qquad b\par			  %2em
+	a\,b a\thinspace b\par    %约为1/6em
+	a\enspace b\par			  %0.5em
+	a\ \ \ \ b\par            %4个空格
+	a~b\par                   %硬空格（不能分割的空格）
+	
+	\subsection{根据参数产生指定间隔}
+	a\kern 1pc b\par
+	a\kern -1em b\par     %b距离a-1em,相当于把ab反向输出为ba
+	a\hskip 1em b\par
+	a\hspace{35pt}b\par
+	
+	\subsection{根据指定字符的宽度来产生空白}
+	a\hphantom{1}b\par
+	a\hphantom{12}b\par
+	a\hphantom{123}b\par
+	a\hphantom{1234}b\par
+	a\hphantom{12345}b\par
+	
+	\subsection{弹性长度空白}
+	a\hfill b\par   %弹性空白可以让两边的字符正好到达纸张边界
+	
+	\section{LateX特殊字符}
+	\subsection{控制符}
+	\#   \$   \%   \{\}   \~{}   \_{}   \^{}   \textbackslash   \&
+	
+	\subsection{排版符号}
+	\S  \P  \dag  \ddag  \copyright  \pounds
+	
+	\subsection{LateX标志符号}
+	\subsubsection{默认自带}
+	\TeX{}   \LaTeX{}   \LaTeXe{}
+	\subsubsection{xltxtra宏包提供}
+	\XeLaTeX
+	\subsubsection{texnames宏包提供}
+	\AmSTeX{}    \AmS-\LaTeX{}
+	\BibTeX{}    \LuaTeX{}
+	\subsubsection{mflogo宏包提供}
+	\METAFONT{}    \MF{}    \MP{}
+	
+	\subsection{引号}
+	`   '   ``   ''    ``你好''    `好'
+	
+	\subsection{连字符}
+	-    --    ---
+	
+	\subsection{非英文字符}
+	\oe  -  \OE  -  \ae  -  \AE  -  \aa  -  \AA  -  \o  -  \O  -  
+	\l   - \L  -  \ss  -  \SS  -  !`   -  ?`
+	
+	\subsection{重音符号(以o为例)}
+	\`o - \'o - \^o - \''o - \~o - \=o - \.o - \u{o} - \v{o} - \H{o} - 
+	\r{o} - \t{o} - \b{o} - \c{o} - \d{o}
+
+  \section{分式}
+	$\frac{1}{5}$
+
+	
+  \begin{tabular}{l|c|p{1.5cm}|c|r}  %l:左对齐 c：居中 r：右对齐 |：在该位置增加竖线 p{1.5cm}指定宽度
+		\hline %\hline为表格增加一条横线
+		姓名 & 语文 & 数学 & 外语 & 备注 \\ %\\结束这一行表格的书写
+		\hline
+		张三 & 98 & 96 & 97 & 优秀 \\
+		\hline
+		李四 & 85 & 87 & 83 & 良好 \\
+		\hline
+		王五 & 73 & 74 & 77 & 一般 \\
+		\hline
+		赵六 & 62 & 66 & 64 & 及格 \\
+		\hline
+	\end{tabular}
+
+  \section{上下标}
+	\subsection{上标}
+	$x^2+y^4=z^3$
+	\subsection{下标}
+	$P_i+N_j=M_k$
+
+  \section{希腊字母}
+	$\alpha$
+	$\beta$
+	$\gamma$
+	$\epsilon$
+	$\pi$
+	$\omega$
+	
+	$\Gamma$
+	$\Delta$
+	$\Theta$
+	$\Pi$
+	$\Omega$
+
+  \section{数学函数}
+	$\log$
+	$\sin$
+	$\cos$
+	$\arcsin$
+
+  \section{多行公式}
+	% gather环境
+	\subsection{gather带编号}
+	\begin{gather}
+		a+b=b+a \\
+		f(x)=x^2+x+1
+	\end{gather}
+	\subsection{gather*不带编号}
+	\begin{gather*}
+		a+b=b+a \\
+		f(x)=x^2+x+1
+	\end{gather*}
+	% align环境，用&进行对齐
+	\subsection{align}
+	\begin{align}
+		a+b&=b+a \\
+		f(x)&=x^2+x+1
+	\end{align}
+	\subsection{align*}
+	\begin{align*}
+		a+b&=b+a \\
+		f(x)&=x^2+x+1
+	\end{align*}
+	% split环境，对其采用align环境对齐方式，编号在中间
+	\subsection{split}
+	\begin{equation}
+		\begin{split}
+			a+b&=b+a \\
+			f(x)&=x^2+x+1
+		\end{split}
+	\end{equation}
+	% cases环境，每行公式用&分割为两个部分，通常表示为值和后面的条件
+	\subsection{cases}
+	\begin{equation}
+		f(x)=\begin{cases}
+			1,&x>0 \\
+			0,&x=0 \\
+			-1,&x<0
+		\end{cases}
+	\end{equation}
+
+
+  \section{矩阵}
+	$\begin{matrix}
+		0 & 1 \\
+		1 & 0
+	\end{matrix}$
+
+	$\begin{pmatrix}
+		0 & 1 \\
+		1 & 0
+	\end{pmatrix}$
+
+	$\begin{bmatrix}
+		0 & 1 \\
+		1 & 0
+	\end{bmatrix}$
+
+	$\begin{Bmatrix}
+	0 & 1 \\
+	1 & 0
+	\end{Bmatrix}$
+
+	$\begin{vmatrix}
+		0 & 1 \\
+		1 & 0
+	\end{vmatrix}$
+
+	$\begin{Vmatrix}
+	0 & 1 \\
+	1 & 0
+	\end{Vmatrix}$
+
+\end{document}
