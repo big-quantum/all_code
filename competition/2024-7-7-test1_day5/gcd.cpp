@@ -1,6 +1,9 @@
 #include<bits/stdc++.h>
 using namespace std;
-
+/*
+30pts: 二进制暴力枚举
+60pts: 暴力枚举gcd
+*/
 
 int n, a[300005], gcdd;
 vector<pair<int, int>> f[3005];
