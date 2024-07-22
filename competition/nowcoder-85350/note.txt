@@ -1,0 +1,7 @@
+b题：WA
+快速幂没问题，质因数分解要讲一下
+可以参考一下https://www.cnblogs.com/BaseAI/p/12056017.html
+c题：TLE
+并查集求联通块
+复杂度O(qnm)？？？
+离线查询？
