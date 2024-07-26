@@ -5,10 +5,9 @@ const int MAXN2 = 505;
 typedef long long ll;
 
 int n, m, mod;
-ll seg[MAXN1 * 4], seg_num[MAXN1], seg_lazy_add[MAXN1 * 4], seg_lazy_mul[MAXN1 * 4];
+ll seg_tree[MAXN1 * 4], seg_num[MAXN1], seg_lazy_add[MAXN1 * 4], seg_lazy_mul[MAXN1 * 4];
 
 #define mid ((l + r) >> 1)
-#define len ((l - r) >> 1 + 1)
 #define rgh ((p << 1) + 1)
 #define lef (p << 1)
 
@@ -16,68 +15,67 @@ void build_tree(ll l, ll r, ll p){
     seg_lazy_add[p] = 0;
     seg_lazy_mul[p] = 1;
     if(l == r){
-        seg[p] = seg_num[l];
+        seg_tree[p] = seg_num[l] % mod;
+        return;
     }
     build_tree(l, mid, lef);
     build_tree(mid + 1, r, rgh);
-    seg[p] = seg[lef] + seg[rgh];
+    seg_tree[p] = (seg_tree[lef] + seg_tree[rgh]) % mod;
 }
 
 void seg_push_down(ll l, ll r, ll p){
-    seg_lazy_add[lef] *= seg_lazy_mul[p] % mod;
-    seg_lazy_mul[lef] *= seg_lazy_mul[p] % mod;
-    seg_lazy_add[lef] += seg_lazy_add[p] % mod;
-    seg_lazy_add[rgh] *= seg_lazy_mul[p] % mod;
-    seg_lazy_mul[rgh] *= seg_lazy_mul[p] % mod;
-    seg_lazy_add[rgh] += seg_lazy_add[p] % mod;
-    seg[lef] *= seg_lazy_mul[p] % mod;
-    seg[lef] += seg_lazy_add[p] * (mid - l + 1) % mod;
-    seg[rgh] *= seg_lazy_mul[p] % mod;
-    seg[rgh] += seg_lazy_add[p] * (r - mid) % mod;
+    seg_lazy_add[lef] = (seg_lazy_add[p] + seg_lazy_mul[p] * seg_lazy_add[lef]) % mod;
+    seg_lazy_mul[lef] = (seg_lazy_mul[lef] * seg_lazy_mul[p]) % mod;
+    seg_lazy_add[rgh] = (seg_lazy_add[p] + seg_lazy_mul[p] * seg_lazy_add[rgh]) % mod;
+    seg_lazy_mul[rgh] = (seg_lazy_mul[rgh] * seg_lazy_mul[p]) % mod;
+    seg_tree[lef] = (seg_tree[lef] * seg_lazy_mul[p] + seg_lazy_add[p] * (mid - l + 1)) % mod;
+    seg_tree[rgh] = (seg_tree[rgh] * seg_lazy_mul[p] + seg_lazy_add[p] * (r - mid)) % mod;
     seg_lazy_add[p] = 0;
     seg_lazy_mul[p] = 1;
 }
 
-void seg_update_add(ll l, ll r, ll p, ll d, ll cl, ll cr){
-    if(l < cr || r > cl) return;
+void seg_update_add(ll d, ll cl, ll cr, ll l, ll r, ll p){// +
+    if(l > cr || r < cl) return;
     if(l >= cl && r <= cr){
-        seg[p] += len * d % mod;
-        if(l != r) seg_lazy_add[p] += d % mod;
+        seg_tree[p] = (seg_tree[p] + (r - l + 1) * d) % mod;
+        if(l != r) seg_lazy_add[p] = (seg_lazy_add[p] + d) % mod;
     } else {
         seg_push_down(l, r, p);
-        seg_update_add(l, mid, lef, d, cl, cr);
-        seg_update_add(mid + 1, r, rgh, d, cl, cr);
-        seg[p] = seg[lef] + seg[rgh] % mod;
+        seg_update_add(d, cl, cr, l, mid, lef);
+        seg_update_add(d, cl, cr, mid + 1, r, rgh);
+        seg_tree[p] = (seg_tree[lef] + seg_tree[rgh]) % mod;
     }
 }
 
-void seg_update_mul(ll l, ll r, ll p, ll d, ll cl, ll cr){
-    if(l < cr || r > cl) return;
+void seg_update_mul(ll d, ll cl, ll cr, ll l, ll r, ll p){// *
+    if(l > cr || r < cl) return;
     if(l >= cl && r <= cr){
-        seg[p] *= d % mod;
-        if(l != r) seg_lazy_mul[p] *= d % mod;
+        seg_tree[p] = (seg_tree[p] * d) % mod;
+        if(l != r){
+            seg_lazy_mul[p] = (seg_lazy_mul[p] * d) % mod;
+            seg_lazy_add[p] = (seg_lazy_add[p] * d) % mod;
+        }
     } else {
         seg_push_down(l, r, p);
-        seg_update_mul(l, mid, lef, d, cl, cr);
-        seg_update_mul(mid + 1, r, rgh, d, cl, cr);
-        seg[p] = seg[lef] + seg[rgh] % mod;
+        seg_update_mul(d, cl, cr, l, mid, lef);
+        seg_update_mul(d, cl, cr, mid + 1, r, rgh);
+        seg_tree[p] = (seg_tree[lef] + seg_tree[rgh]) % mod;
     }
 }
 
-ll seg_query(ll l, ll r, ll p, ll cl, ll cr){
-    if(l < cr || r > cl) return 0;
+ll seg_query(ll cl, ll cr, ll l = 1, ll r = n, ll p = 1){// 区间求和
+    if(l > cr || r < cl) return 0;
     if(l >= cl && r <= cr){
-        return seg[p] % mod;
+        return seg_tree[p];
     } else {
         seg_push_down(l, r, p);
-        return seg_query(l, mid, lef, cl, cr) + seg_query(mid + 1, r, rgh, cl, cr) % mod;
+        return (seg_query(cl, cr, l, mid, lef) + seg_query(cl, cr, mid + 1, r, rgh)) % mod;
     }
 }
 
 #undef lef
 #undef rgh
 #undef mid
-#undef len
 
 int main(){
     cin >> n >> m >> mod;
@@ -91,14 +89,14 @@ int main(){
         if(tmp == 1){
             int k;
             cin >> k;
-            seg_update_mul(1, n, 1, k, x, y);
+            seg_update_mul(k % mod, x, y, 1, n, 1);
         } else {
             if(tmp == 2){
                 int k;
                 cin >> k;
-                seg_update_add(1, n, 1, k, x, y);
+                seg_update_add(k % mod, x, y, 1, n, 1);
             } else {
-                cout << seg_query(1, n, 1, x, y) << endl;
+                cout << seg_query(x, y) << endl;
             }
         }
     }

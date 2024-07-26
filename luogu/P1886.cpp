@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-deque<pair<int, int> > q1, q2;//q1¼õ£¬q2Ôö 
+deque<pair<int, int> > q1, q2;//q1å‡ï¼Œq2å¢ 
 int n, a[1000005], k, ans[1000005], cnt = 1;
 
 int main(){
