@@ -1,14 +1,15 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-int n, m, r[1000005], cf[1000005], d[1000005], s[1000005], t[1000005];
+long long n, m, r[1000005], cf[1000005], d[1000005], s[1000005], t[1000005];
 
 bool check(int k){
+    memset(cf, 0, sizeof(cf));
     for(int i = 1; i <= k; i++){
         cf[s[i]] += d[i];
         cf[t[i] + 1] -= d[i];
     }
-    int tmp = 0;
+    long long tmp = 0;
     for(int i = 1; i <= n; i++){
         tmp += cf[i];
         if(tmp > r[i]) return false;
@@ -24,25 +25,25 @@ int main(){
     for(int i = 1; i <= m; i++){
         cin >> d[i] >> s[i] >> t[i];
     }
-    int l = 1, r = n, mid, ans = -1;
-    while(l <= r){
-        mid = (l + r) >> 1;
-        if(check(mid)){
-            l = mid + 1;
-            ans = mid;
-        } else {
-            r = mid - 1;
-        }
-    }
-    if(ans == n){
+    
+    if(check(m)){
         cout << 0 << endl;
     } else {
+        int l = 1, r = m, mid;
+        while(l <= r){
+            mid = (l + r) >> 1;
+            if(check(mid)){
+                l = mid + 1;
+            } else {
+                r = mid - 1;
+            }
+        }
         cout << -1 << endl;
-        cout << ans << endl;
+        cout << l << endl;
     }
     return 0;
 }
-/*
+/*// O(n + m)
 int n, m, r[1000005];
 int main(){
     cin >> n >> m;
