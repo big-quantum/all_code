@@ -7,11 +7,11 @@ vector<pair<int, int> > up, down;
 string s;
 
 bool cmp1(pair<int, int> a, pair<int, int> b){
-    return a.first < b.first;
+    return a.first > b.first;
 }
 
 bool cmp2(pair<int, int> a, pair<int, int> b){
-    return a.first > b.first;
+    return a.first < b.first;
 }
 
 int main(){
@@ -54,13 +54,10 @@ int main(){
 			all += tot[i.second];
         }
         for(auto i : up){
-            ans[i.second] = ++cnt;
+            cout << i.second << endl;
         }
         for(auto i : down){
-            ans[i.second] = ++cnt;
-        }
-        for(int i = 1; i <= n; i++){
-            cout << ans[i] << endl;
+            cout << i.second << endl;
         }
     }
     return 0;

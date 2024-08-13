@@ -12,24 +12,6 @@ ull a[N], ans;
 vector<int> G[N];
 queue<int> Q;
 
-// 快速幂函数，计算 a^b % prime
-inline int ksm(int a, int b) {
-    int ret = 1;
-    for (; b; b >>= 1, a = 1ll * a * a % prime)
-        if (b & 1) ret = 1ll * ret * a % prime;
-    return ret;
-}
-
-// 计算 x 在模 prime 下的逆元
-inline int inv(int x) {
-    return ksm(x, prime - 2);
-}
-
-// 计算 p/q % prime，其中 q 和 prime 互质
-inline int rev(int p, int q) {
-    return 1LL * p * inv(q) % prime;
-}
-
 // 广度优先搜索，计算从 S 到所有点的距离
 void bfs(int S) {
     f[S][S] = 1;
@@ -95,4 +77,22 @@ int main() {
 
     cout << ans;
     return 0;
+}
+
+// 快速幂函数，计算 a^b % prime
+inline int ksm(int a, int b) {
+    int ret = 1;
+    for (; b; b >>= 1, a = 1ll * a * a % prime)
+        if (b & 1) ret = 1ll * ret * a % prime;
+    return ret;
+}
+
+// 计算 x 在模 prime 下的逆元
+inline int inv(int x) {
+    return ksm(x, prime - 2);
+}
+
+// 计算 p/q % prime，其中 q 和 prime 互质
+inline int rev(int p, int q) {
+    return 1LL * p * inv(q) % prime;
 }
