@@ -2,6 +2,7 @@
 using namespace std;
 const int MAXN1 = 100005;
 const int MAXN2 = 505;
+const int mod =  1e9 + 7;
 typedef long long ll;
 int n, m;
 
@@ -36,7 +37,7 @@ void uf_merge(int i, int j){// 合并两个并查集, 按秩合并
 // union_find-end
 
 // tree_num_group 树状数组
-int tree_ng_[MAXN1];
+int tree_ng[MAXN1];
 
 int tree_ng_lowbit(int x){// lowbit：28_2 = 0001 1100, lowbit(28) = 0000 0100 = 4_10
     return x&(-x);
@@ -44,14 +45,14 @@ int tree_ng_lowbit(int x){// lowbit：28_2 = 0001 1100, lowbit(28) = 0000 0100 =
 
 void tree_ng_change(int i, int j){
     for(int pos = i; pos <= n; pos += tree_ng_lowbit(pos)){
-        tree_ng_[pos] += j;
+        tree_ng[pos] += j;
     }
 }
 
 int tree_ng_search(int k){// 求前k相的和
     int ans = 0;
     for(int pos = k; pos >= 0; pos -= tree_ng_lowbit(pos)){
-        ans += tree_ng_[pos];
+        ans += tree_ng[pos];
     }
     return ans;
 }
@@ -62,7 +63,7 @@ int tree_ng_search(int i, int j){
 // tree_num_group_end
 
 // segment_tree 线段树，支持加、减、乘。
-ll seg_tree[MAXN1 * 4], seg_num[MAXN1], seg_lazy_add[MAXN1 * 4], seg_lazy_mul[MAXN1 * 4], seg_mod;
+ll seg_tree[MAXN1 * 4], seg_num[MAXN1], seg_lazy_add[MAXN1 * 4], seg_lazy_mul[MAXN1 * 4];
 
 #define mid ((l + r) >> 1)
 #define rgh ((p << 1) + 1)
@@ -72,21 +73,21 @@ void build_tree(ll l, ll r, ll p){
     seg_lazy_add[p] = 0;
     seg_lazy_mul[p] = 1;
     if(l == r){
-        seg_tree[p] = seg_num[l] % seg_mod;
+        seg_tree[p] = seg_num[l] % mod;
         return;
     }
     build_tree(l, mid, lef);
     build_tree(mid + 1, r, rgh);
-    seg_tree[p] = (seg_tree[lef] + seg_tree[rgh]) % seg_mod;
+    seg_tree[p] = (seg_tree[lef] + seg_tree[rgh]) % mod;
 }
 
 void seg_push_down(ll l, ll r, ll p){
-    seg_lazy_add[lef] = (seg_lazy_add[p] + seg_lazy_mul[p] * seg_lazy_add[lef]) % seg_mod;
-    seg_lazy_mul[lef] = (seg_lazy_mul[lef] * seg_lazy_mul[p]) % seg_mod;
-    seg_lazy_add[rgh] = (seg_lazy_add[p] + seg_lazy_mul[p] * seg_lazy_add[rgh]) % seg_mod;
-    seg_lazy_mul[rgh] = (seg_lazy_mul[rgh] * seg_lazy_mul[p]) % seg_mod;
-    seg_tree[lef] = (seg_tree[lef] * seg_lazy_mul[p] + seg_lazy_add[p] * (mid - l + 1)) % seg_mod;
-    seg_tree[rgh] = (seg_tree[rgh] * seg_lazy_mul[p] + seg_lazy_add[p] * (r - mid)) % seg_mod;
+    seg_lazy_add[lef] = (seg_lazy_add[p] + seg_lazy_mul[p] * seg_lazy_add[lef]) % mod;
+    seg_lazy_mul[lef] = (seg_lazy_mul[lef] * seg_lazy_mul[p]) % mod;
+    seg_lazy_add[rgh] = (seg_lazy_add[p] + seg_lazy_mul[p] * seg_lazy_add[rgh]) % mod;
+    seg_lazy_mul[rgh] = (seg_lazy_mul[rgh] * seg_lazy_mul[p]) % mod;
+    seg_tree[lef] = (seg_tree[lef] * seg_lazy_mul[p] + seg_lazy_add[p] * (mid - l + 1)) % mod;
+    seg_tree[rgh] = (seg_tree[rgh] * seg_lazy_mul[p] + seg_lazy_add[p] * (r - mid)) % mod;
     seg_lazy_add[p] = 0;
     seg_lazy_mul[p] = 1;
 }
@@ -94,29 +95,29 @@ void seg_push_down(ll l, ll r, ll p){
 void seg_update_add(ll d, ll cl, ll cr, ll l, ll r, ll p){// +
     if(l > cr || r < cl) return;
     if(l >= cl && r <= cr){
-        seg_tree[p] = (seg_tree[p] + (r - l + 1) * d) % seg_mod;
-        if(l != r) seg_lazy_add[p] = (seg_lazy_add[p] + d) % seg_mod;
+        seg_tree[p] = (seg_tree[p] + (r - l + 1) * d) % mod;
+        if(l != r) seg_lazy_add[p] = (seg_lazy_add[p] + d) % mod;
     } else {
         seg_push_down(l, r, p);
         seg_update_add(d, cl, cr, l, mid, lef);
         seg_update_add(d, cl, cr, mid + 1, r, rgh);
-        seg_tree[p] = (seg_tree[lef] + seg_tree[rgh]) % seg_mod;
+        seg_tree[p] = (seg_tree[lef] + seg_tree[rgh]) % mod;
     }
 }
 
 void seg_update_mul(ll d, ll cl, ll cr, ll l, ll r, ll p){// *
     if(l > cr || r < cl) return;
     if(l >= cl && r <= cr){
-        seg_tree[p] = (seg_tree[p] * d) % seg_mod;
+        seg_tree[p] = (seg_tree[p] * d) % mod;
         if(l != r){
-            seg_lazy_mul[p] = (seg_lazy_mul[p] * d) % seg_mod;
-            seg_lazy_add[p] = (seg_lazy_add[p] * d) % seg_mod;
+            seg_lazy_mul[p] = (seg_lazy_mul[p] * d) % mod;
+            seg_lazy_add[p] = (seg_lazy_add[p] * d) % mod;
         }
     } else {
         seg_push_down(l, r, p);
         seg_update_mul(d, cl, cr, l, mid, lef);
         seg_update_mul(d, cl, cr, mid + 1, r, rgh);
-        seg_tree[p] = (seg_tree[lef] + seg_tree[rgh]) % seg_mod;
+        seg_tree[p] = (seg_tree[lef] + seg_tree[rgh]) % mod;
     }
 }
 
@@ -126,7 +127,7 @@ ll seg_query(ll cl, ll cr, ll l = 1, ll r = n, ll p = 1){// 区间求和
         return seg_tree[p];
     } else {
         seg_push_down(l, r, p);
-        return (seg_query(cl, cr, l, mid, lef) + seg_query(cl, cr, mid + 1, r, rgh)) % seg_mod;
+        return (seg_query(cl, cr, l, mid, lef) + seg_query(cl, cr, mid + 1, r, rgh)) % mod;
     }
 }
 
@@ -134,7 +135,7 @@ ll seg_query(ll cl, ll cr, ll l = 1, ll r = n, ll p = 1){// 区间求和
 #undef rgh
 #undef mid
 
-// segment_tree-end
+// segment_tree_end
 
 // sq_
 
