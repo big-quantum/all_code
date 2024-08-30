@@ -3,14 +3,14 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <windows.h>
-int feiji_x,feiji_y;//飞机位置
-int zidan_x,zidan_y;//子弹位置
-int diji_x,diji_y;//敌机位置
+int feiji_x,feiji_y;//???λ??
+int zidan_x,zidan_y;//???λ??
+int diji_x,diji_y;//?л?λ??
 int h,w;
-int score=0;//得分
+int score=0;//?÷?
 int c=0;
  
-void gotoxy(int x,int y){				//定位光标位置到指定坐标
+void gotoxy(int x,int y){				//??λ???λ??????????
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 	COORD pos;
 	pos.X=x;
@@ -36,13 +36,13 @@ void show(){
 	char dad;
 	if(c==0){
 		printf("======================================\n");
-		printf("=           ---打飞机---             =\n");
-		printf("=       w,a,s,d------控制飞机移动    =\n");
-		printf("=           不要开中文输入法         =\n");
-		printf("=       j------------发射子弹        =\n");
+		printf("=           ---????---             =\n");
+		printf("=       w,a,s,d------?????????    =\n");
+		printf("=           ?????????????         =\n");
+		printf("=       j------------???????        =\n");
 		printf("=                                    =\n");
-		printf("=         闪屏纯属正常               =\n");
-		printf("=                        ----倾白白  =\n");
+		printf("=         ????????????               =\n");
+		printf("=                        ----????  =\n");
 		printf("======================================\n");
 		c++;
 		dad=getch();
@@ -52,17 +52,17 @@ void show(){
 	for(i=0;i<h;i++){
 		for(j=0;j<w;j++){
 			if(i==feiji_x && j==feiji_y)
-				printf("▲");
+				printf("??");
 			else if(i==zidan_x && j==zidan_y)
-				printf("↑");
+				printf("??");
 			else if(i==diji_x && j==diji_y)
-				printf("●");
+				printf("??");
 			else 
 				printf(" ");
 		}
 		printf("\n");
 	}
-	printf("当前得分：%d",score);
+	printf("????÷??%d",score);
 	Sleep(50);
 }
 void wuguan(){
@@ -105,13 +105,13 @@ void youguan(){
 	}
 }
 int main(){
-	startup();//数据
+	startup();//????
 	while(1){
-		show();//显示画面
-		wuguan();//与用户无关变量
-		youguan();//与用户有关变量
+		show();//???????
+		wuguan();//???????????
+		youguan();//??????й????
 		if(score==5){
-			printf("通关了的，大佬，嘿嘿\n");
+			printf("??????????У????\n");
 			break;
 		}
 	}

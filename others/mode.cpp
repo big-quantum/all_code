@@ -1,13 +1,12 @@
 #include<bits/stdc++.h>
 using namespace std;
-const int MAXN1 = 100005;
-const int MAXN2 = 505;
+const int MAXN = 500005;
 const int mod =  1e9 + 7;
 typedef long long ll;
 int n, m;
 
 // union_find 并查集
-int uf_fa[MAXN1], uf_rank[MAXN1];// 每个元素的父节点, 每个并查集的深度
+int uf_fa[MAXN], uf_rank[MAXN];// 每个元素的父节点, 每个并查集的深度
 
 void uf_init(int n){// 并查集初始化
     for(int i = 1; i <= n; i++){
@@ -32,12 +31,15 @@ void uf_merge(int i, int j){// 合并两个并查集, 按秩合并
     } else {
         uf_fa[x] = y;
     }
+    if(uf_rank[x] == uf_rank[y] && x != y){
+        uf_rank[y]++;
+    }
 }
 
 // union_find-end
 
 // tree_num_group 树状数组
-int tree_ng[MAXN1];
+int tree_ng[MAXN];
 
 int tree_ng_lowbit(int x){// lowbit：28_2 = 0001 1100, lowbit(28) = 0000 0100 = 4_10
     return x&(-x);
@@ -63,7 +65,7 @@ int tree_ng_search(int i, int j){
 // tree_num_group_end
 
 // segment_tree 线段树，支持加、减、乘。
-ll seg_tree[MAXN1 * 4], seg_num[MAXN1], seg_lazy_add[MAXN1 * 4], seg_lazy_mul[MAXN1 * 4];
+ll seg_tree[MAXN * 4], seg_num[MAXN], seg_lazy_add[MAXN * 4], seg_lazy_mul[MAXN * 4];
 
 #define mid ((l + r) >> 1)
 #define rgh ((p << 1) + 1)
@@ -137,25 +139,249 @@ ll seg_query(ll cl, ll cr, ll l = 1, ll r = n, ll p = 1){// 区间求和
 
 // segment_tree_end
 
-// sq_
+
+//save_graph
+
+//save_graph_1
+struct node{
+    int next, to, w, from;
+}edge1[MAXN];
+int head[MAXN], cnt;
+
+void add_edge1(int from, int to, int w){
+    edge1[++cnt].w = w;
+    edge1[cnt].to = to;
+    edge1[cnt].from = from;
+    edge1[cnt].next = head[from];
+    head[from] = cnt;
+}
+//save_graph_1_end
+
+//save_graph_2
+struct edge{
+    int to, w;
+};
+vector<edge> edge2[MAXN];
+
+void add_edge2(int from, int to, int w){
+    edge2[from].push_back({to, w});
+}
+//save_graph_2_end
+
+//save_graph_3 
+int edge3[MAXN][MAXN];
+
+void add_edge3(int from, int to, int w){
+    edge3[from][to] = w;
+}
+//save_graph_3_end
+
+// save_graph_end
+
+//floyd
+int dis_floyd[MAXN][MAXN];
+
+void floyd(int n){//多源最短路
+    memset(dis_floyd, 0x3f, sizeof(dis_floyd));
+
+    for(int i = 1; i <= n; i++){
+        for(int j = 1; j <= n; j++){
+            for(int k = 1; k <= n; k++){
+                dis_floyd[j][k] = min(dis_floyd[j][k], dis_floyd[j][i] + dis_floyd[i][k]);
+            }
+        }
+    }
+}
+//floyd_end
+
+//bellman_ford
+int dis_bellman_ford[MAXN];
+
+void bellman_ford_save1(){
+    for(int i = 1; i <= n; i++){
+        for(int j = 1; j <= cnt; j++){
+            dis_bellman_ford[edge1[j].to] = min(edge1[j].to, edge1[j].from + edge1[j].w);
+        }
+    }
+}
+
+void bellman_ford_save3(){
+    for(int i = 1; i <= n; i++){
+        for(int j = 1; j <= n; j++){
+            dis_bellman_ford[i] = min(dis_bellman_ford[i], dis_bellman_ford[j] + edge3[i][j]);
+        }
+    }
+}
+//bellman_ford_end
+
+//spfa
+vector<int> dis(MAXN, INT_MAX);//赋初值
+bool inqueue[MAXN];
+
+void spfa_save1(int u){
+    queue<int> q;
+    q.push(u);
+    dis[u] = 0;
+    inqueue[u] = true;
+    while (!q.empty()){
+        int f = q.front();
+        q.pop();
+        inqueue[f] = false;
+        for (int i = head[f]; i != 0; i = edge1[i].next){
+            int to = edge1[i].to, w = edge1[i].w;
+            if(dis[to] > dis[f] + w){
+                dis[to] = dis[f] + w;
+                if(!inqueue[f]){
+                    inqueue[f] = true;
+                    q.push(f);
+                }
+            }
+        }
+    }
+}
+
+void spfa_save_2(int u){
+    queue<int> q;
+    q.push(u);
+    dis[u] = 0;
+    inqueue[u] = true;
+    while (!q.empty()){
+        int f = q.front();
+        q.pop();
+        inqueue[f] = false;
+        for (auto i : edge2[f]){
+            int to = i.to, w = i.w;
+            if(dis[to] > dis[f] + w){
+                dis[to] = dis[f] + w;
+                if(!inqueue[f]){
+                    inqueue[f] = true;
+                    q.push(f);
+                }
+            }
+        }
+    }
+}
+
+//判负环
+int cntt[MAXN];
+bool flag[MAXN];
+bool spfa(int u){
+	memset(cntt, 0, sizeof(cntt));
+	memset(flag, false, sizeof(flag));
+	queue<int> q;
+	q.push(u);
+	flag[u] = true;
+	dis[u] = 0;
+	while(!q.empty()){
+		int f = q.front();
+		q.pop();
+		flag[f] = false;
+		for(int i = head[f]; i != -1; i = e[i].next){
+			int to = e[i].to;
+			if(dis[to] > dis[f] + e[i].w){
+				dis[to] = dis[f] + e[i].w;
+				cntt[to] = cntt[f] + 1;
+				if(cntt[to] >= n) return true;
+				if(!flag[to]){
+					q.push(to);
+					flag[to] = true;
+				}
+			}
+		}
+	}
+	return false;
+}
+//spfa_end
+
+//dij
+
+priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> q;
+int dist[MAXN];
+bool vis[MAXN];
+
+void dijkstra(int s){
+    dist[s] = 0;
+    q.push(make_pair(0, s));
+    while(!q.empty()){
+        int p = q.top().second;
+        q.pop();
+        if(vis[p]) continue;
+        vis[p] = true;
+        for(auto i : edge2[p]){
+            int to = i.to;
+            dist[to] = min(dist[to], dist[p] + i.w);
+            if(!vis[to]) q.push(make_pair(dist[to], to));
+        }
+    }
+}
+
+
+//tarjan 强连通分量
+
+int dfn[MAXN], low[MAXN], top, stk[MAXN], times, scc_cnt, id[MAXN];
+bool instk[MAXN];
+void tarjan(int u){
+    dfn[u] = low[u] = ++times;
+    stk[top++] = u;
+    instk[u] = true;
+    for(auto i : edge2[u]){
+        int v = i.to;
+        if(!dfn[v]){
+            tarjan(v);
+            low[u] = min(low[u], low[v]);
+        } else if(instk[v]){
+            low[u] = min(low[u], dfn[v]);
+        }
+    }
+    if(low[u] == dfn[u]){
+        scc_cnt++;
+        int tmp;
+        do{
+            tmp = stk[--top];
+            id[tmp] = scc_cnt;
+            instk[tmp] = false;
+        } while (tmp != u);
+    }
+}
+
+//tarjan_end 强连通分量
+
+//tarjan 边双连通分量
+
+int dfn[MAXN], low[MAXN], top, stk[MAXN], times, dcc_cnt, id[MAXN];
+void tarjan(int u){
+    dfn[u] = low[u] = ++times;
+    stk[top++] = u;
+    for(auto i : edge2[u]){
+        int v = i.to;
+        if(!dfn[v]){
+            tarjan(v);
+            low[u] = min(low[u], low[v]);
+            if(dfn[u] < low[v]){
+                is_bridge
+            }
+        } else if(instk[v]){
+            low[u] = min(low[u], dfn[v]);
+        }
+    }
+    if(low[u] == dfn[u]){
+        dcc_cnt++;
+        int tmp;
+        do{
+            tmp = stk[--top];
+            id[tmp] = dcc_cnt;
+        } while (tmp != u);
+    }
+}
+
+//tarjan_end 边双连通分量
 
 // lca_
 
-const int MAXN = 500005;
-int n, m, dep[MAXN], fa[MAXN][205], log_2[MAXN], p[MAXN];
+int dep[MAXN], fa[MAXN][205], log_2[MAXN], p[MAXN];
 bool vis[MAXN * 2];
 int st[MAXN];
-int head[MAXN * 2], to[MAXN * 2], nextt[MAXN * 2], cnt, ans[MAXN];
-vector<pair<int, int>> query[MAXN];
-
-void add(int a, int b){
-    to[++cnt] = b;
-    nextt[cnt] = head[a];
-    head[a] = cnt;
-    to[++cnt] = a;
-    nextt[cnt] = head[b];
-    head[b] = cnt;
-}
+vector<pair<int, int>> query;
 
 int find(int x){
     if(p[x] != x){
@@ -166,8 +392,8 @@ int find(int x){
 
 void tarjan(int u){
     st[u] = 1;
-    for (int i = head[u]; i != 0; i = nextt[i]){
-        int t = to[i];
+    for (int i = head[u]; i != 0; i = edge1[i].next){
+        int t = edge1[i].to;
         if(!st[t]) {
             tarjan(t);
             p[t] = u;
@@ -252,10 +478,6 @@ int main(){
     return 0;
 }
 
-int main(){
-
-    return 0;
-}
 //负环
 
 int t, n, m;
@@ -273,49 +495,13 @@ void add(int from, int to, int w){
 	head[from] = cnt;	
 }
 
-int dis[3005], cntt[3005];
-bool flag[3005];
 
-bool spfa(){
-	memset(dis, 0x3f, sizeof(dis));
-	memset(cntt, 0, sizeof(cntt));
-	memset(flag, false, sizeof(flag));
-	
-	queue<int> q;
-	q.push(1);
-	flag[1] = true;
-	dis[1] = 0;
-
-	while(!q.empty()){
-		int f = q.front();
-		q.pop();
-		flag[f] = false;
-		for(int i = head[f]; i != -1; i = e[i].next){
-			int to = e[i].to;
-			if(dis[to] > dis[f] + e[i].w){
-				dis[to] = dis[f] + e[i].w;
-				cntt[to] = cntt[f] + 1;
-				if(cntt[to] >= n) return true;
-				if(!flag[to]){
-					q.push(to);
-					flag[to] = true;
-				}
-			}
-		}
-	}
-	
-	return false;
-
-}
 
 int main(){
 	cin >> t;
-	
 	while(t--){
-		
 		memset(head, -1, sizeof(head));
 		cnt = 0;
-
 		cin >> n >> m;
 		for(int i = 1; i <= m; i++){
 			int u, v, w;
@@ -327,42 +513,33 @@ int main(){
 				add(u, v, w);
 			}
 		}
-		
 		for(int i = 1; i <= m*2; i++){
 			cout<<e[i].next<<" "<<e[i].to<<" "<<e[i].w<<endl;;
 		}
 		if(spfa()) cout << "YES" << endl;
 		else cout << "NO" << endl;
-
 	}
-	
 	return 0;
 }
 
 //quickpower
-long long a, b, p, ans = 1, bb;
 
-int main(){
-	
-	cin >> a >> b >> p;
-	bb = b;
-	long long pow = a;
+long long quickpower(int a, int b){
+    long long pow = a;
 	while(b > 0){
 		if(b & 1){
-			ans *= pow;
-			ans %= p;
+			a *= pow;
+			a %= mod;
 		}
 		pow *= pow;
-		pow %= p;
+		pow %= mod;
 		b >>= 1; 
-	}
-	ans %= p;
-	printf("%lld^%lld mod %lld=%lld", a, bb, p, ans);
-	return 0;
+    }
+    return a % mod;
 }
 
 //单调栈
-int n, length[3000005], ans[3000005];
+int n, length[MAXN], ans[MAXN];
 stack<int> sta;
 
 int main() {
@@ -382,8 +559,8 @@ int main() {
     }
     return 0;
 }
+
 //差分约束
-const int MAXN = 10005;
 
 int _next[MAXN], head[MAXN], to[MAXN], cnt, val[MAXN];
 int n, m;
@@ -405,7 +582,6 @@ bool spfa(int from){
 		dist[i] = INT_MAX;
 	}
 	dist[from] = 0;
-	
 	while(!q.empty()){
 		int p = q.front();
 		inque[p] = false;
@@ -436,7 +612,6 @@ int main(){
 	for(int i = 1; i <= n; i++){
 		add(n + 1, i, 0);
 	}
-	
 	if(spfa(n + 1)){
 		for(int i = 1; i <= n; i++){
 			cout << dist[i] << " ";
@@ -449,7 +624,7 @@ int main(){
 
 //单调队列、滑动窗口
 deque<pair<int, int> > q1, q2;//q1减，q2增 
-int n, a[1000005], k, ans[1000005], cnt = 1;
+int n, a[MAXN], k, ans[1000005], cnt = 1;
 
 int main(){
 	cin >> n >> k;
@@ -479,8 +654,6 @@ int main(){
 }
 
 //diction_tree
-
-const int MAXN = 3000005;
 
 int cnt = 1, tt, cntt[MAXN], _next[MAXN][100];
 
@@ -514,7 +687,7 @@ int main(){
                 _next[i][j] = 0;
         for(int i = 0; i <= cnt; i++)
             cntt[i] = 0;
-        cnt = 1
+        cnt = 1;
         string a;
         for(int i = 1; i <= n; i++){
             cin >> a;
@@ -527,6 +700,7 @@ int main(){
     }
     return 0;
 }
+
 //欧拉筛
 //2-n中的质数 O(n) P3383
 void prime(int n){
