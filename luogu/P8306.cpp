@@ -35,7 +35,7 @@ int main(){
                 _next[i][j] = 0;
         for(int i = 0; i <= cnt; i++)
             cntt[i] = 0;
-        cnt = 1
+        cnt = 1;
         string a;
         for(int i = 1; i <= n; i++){
             cin >> a;
